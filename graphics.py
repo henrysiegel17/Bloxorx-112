@@ -22,7 +22,7 @@ def onAppStart(app):
     app.f = 2
 
     # (x,y,z)
-    app.Piece = block.Block((-0.5,0,0),(0.1,0.2,0.1))
+    app.Piece = block.Block((-0.5,0,0),(0.3,0.2,0.1))
 
 def redrawAll(app):
     drawBlock(app)
@@ -67,23 +67,61 @@ def onKeyPress(app, key):
     print(app.Piece.extension)
     # https://en.wikipedia.org/wiki/Rotation_matrix
 
+    points = app.Piece.points
+
+    # translation <-- rotation <--- translation
+
+    # average x-cor of p1 and p2
+    xAvg = (points[0][0] + points[1][0])/2
+    # average z-cor of p1 and p5
+    zAvg = (points[0][2] + points[4][2])/2
+
+    xOffSet = app.Piece.extension[0]/2
+    zOffSet = app.Piece.extension[2]/2
+    offSet = None
+    avgMove = None
+
+    # need to check if x,z is positive or negative
+    if xAvg < 0:
+        xOffSet *= -1
+    if zAvg < 0:
+        zOffSet *= -1
+
     index = 0
     angle = math.pi/2
     if key == 'right':
         index = 3
+        offSet = xOffSet
+        avgMove = xAvg
     elif key == 'left':
         index = 3
         angle *= -1
+        avgMove = xAvg
+        offSet = -xOffSet
     elif key == 'up':
         index = 1
+        avgMove = zAvg
+        offSet = zOffSet
     elif key == 'down':
         index = 1
         angle *= -1
+        avgMove = zAvg
+        offSet = -zOffSet
 
     if index != 0:
-        points = app.Piece.points
         for i in range(len(points)):
+            # FIRST THE TRANSLATION PART:
+            displacement = None
+            if index == 1:
+                displacement = [-offSet - avgMove, 0,0]
+            elif index == 3:
+                displacement = [0,0,-offSet - avgMove]
+            points[i] = matrix.vectorAddition(points[i], displacement)
+            # THEN THE ROTATION
             points[i] = matrix.rotate(points[i], angle, index)
+            # AND FINALLY THE INVERSE TRANSLATION
+            displacement = matrix.reverseVector(displacement)
+            points[i] = matrix.vectorAddition(points[i], displacement)
 
         # don't forget to updateEdges:
         app.Piece.updateEdges()

@@ -49,5 +49,9 @@ def rotate(v,t,i):
          ]
     return matrixMultiply(M,v)
 
+def reverseVector(v):
+    return tuple(-e for e in v)
+        
+
 
 
