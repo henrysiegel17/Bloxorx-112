@@ -24,6 +24,8 @@ def matrixMultiply (M, v):
 def getProjection(x, z, n):
     return n*x/(z+n)
 
+# https://en.wikipedia.org/wiki/Rotation_matrix
+
 def rotate(v,t,i):  
     M = None
     # ROTATE X
@@ -51,6 +53,22 @@ def rotate(v,t,i):
 
 def reverseVector(v):
     return tuple(-e for e in v)
+
+# type = 0: minimum
+# type = 1: maximum
+def findExtremum(points, index, type):
+    extreme = points[0][index]
+    for p in points:
+        if type == 0:
+            if p[index] < extreme:
+                extreme = p[index]
+        elif type == 1:
+            if p[index] > extreme:
+                extreme = p[index]
+    return extreme
+
+def scaleVector(v, s):
+    return tuple(s*e for e in v)
         
 
 
