@@ -9,6 +9,7 @@ def vectorAddition(v1,v2):
             newV[i] = v1[i] + v2[i]
         return tuple(e for e in newV)
 
+
 def matrixMultiply (M, v):
     if isinstance(v, tuple) and len(v) == len(M[0]):
         newV = [0]*len(v)
