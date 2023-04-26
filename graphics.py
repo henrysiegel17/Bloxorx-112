@@ -76,11 +76,25 @@ def restart(app):
     app.menuScreen = False
 
 def onStep(app):
+
+    # transitioning to next level
     if app.levelTransition and not app.menuScreen:
         app.moveInSpeed = 0.1
         if app.moveInSpeed * app.transitionTime < app.fadeDistance:
 
             app.transitionTime += 1
+            points = app.Piece.points
+            yCM = (matrix.findExtremum(points,1,1) + matrix.findExtremum(points,1,0))/2
+
+            if app.rotateCounter <= app.maxCounter:
+                rotate(app, app.Piece, 1, -(math.pi/2)/app.maxCounter, yCM)
+                app.rotateCounter += 1
+            else:
+                app.rotateCounter = 0
+                app.extrema = matrix.findExtremum(points,2,1)
+                app.Piece.updateEdges()
+
+
         else:
             app.moveInSpeed = 0
             app.transitionTime = 0
@@ -130,6 +144,7 @@ def onStep(app):
 
                 # CHECK IF THE PLAYER WINS
                 if app.level.verifyWin():
+                    app.rotateCounter = app.maxCounter
 
                     print('You Win!')
                     if app.levelNumber < len(boards.levels) - 1:
@@ -269,18 +284,13 @@ def randomWalk(app):
 
 def redrawAll(app):
     if app.levelTransition == True and not app.menuScreen:
-        if app.transitionTime > 2:
+        if app.transitionTime < 180:
             # only next Level comes in
             print('calling extremum')
-            drawTiles(app, math.pi/4, 1,2)
-        else:
-            # both levels come in
+            drawBlock(app, app.Piece, math.pi/4)
 
-            # scroll current level
-            drawTiles(app, math.pi/4, 1,3)
-
-            # scroll next level
-            drawTiles(app, math.pi/4, 1,2)
+        # scroll next level
+        drawTiles(app, math.pi/4, 1,2)
 
 
     elif app.levelNumber != -1 and not app.menuScreen:
@@ -425,7 +435,7 @@ def onKeyPress(app, key):
             restart(app)
     else:
         points = app.Piece.points
-        if app.rotateType == 0:
+        if app.rotateType == 0 and app.levelTransition == False:
             if key == 'right':
                 app.rotateType = 1
                 app.extremum = matrix.findExtremum(points,0,1)

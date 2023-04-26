@@ -130,7 +130,7 @@ class Map:
                 if point not in self.tileCoordinates:
                     outsideCount += 1
 
-        if outsideCount >= self.PieceArea/2:
+        if outsideCount >= 1:
             return False
 
         # block is inside
